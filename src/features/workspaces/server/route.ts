@@ -22,7 +22,8 @@ const app = new Hono()
             WORKSPACES_ID,
             ID.unique(),
             {
-                name,
+                name: name,
+                userId: user.$id
             },
         );
 
