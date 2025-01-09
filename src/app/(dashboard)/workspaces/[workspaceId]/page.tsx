@@ -1,3 +1,4 @@
+import AIInterface from "@/components/AIComponent";
 import { getCurrent } from "@/features/auth/action";
 import { redirect } from "next/navigation";
 
@@ -6,8 +7,8 @@ const WorkspaceIdPage = async () => {
     if (!user) redirect("/sign-in");
 
     return (
-      <div>
-        Workspace Id
+      <div className="p-6">
+        <AIInterface />
       </div>
     );
   };

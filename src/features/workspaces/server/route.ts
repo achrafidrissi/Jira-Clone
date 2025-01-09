@@ -12,6 +12,7 @@ import {
 import { ID, Query } from "node-appwrite";
 import { MemberRole } from "@/features/members/type";
 import { generateInviteCode } from "@/lib/utils";
+import { getMember } from "@/features/members/utils";
 
 const app = new Hono()
   .get("/", sessionMiddleware, async (c) => {
@@ -101,7 +102,15 @@ const app = new Hono()
       const { workspaceId } = c.req.param();
       const { name, image } = c.req.valid('form');
 
-      const member = null; 
+      const member = await getMember ({
+        databases,
+        workspaceId,
+        userId: user.$id,
+      });
+      
+      if (!member || member.role !== MemberRole.ADMIN) {
+        return c.json({ error: "Unauthorized" }, 401);
+      }
     }
   );
 
