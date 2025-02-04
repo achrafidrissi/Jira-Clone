@@ -19,7 +19,7 @@ export default function AIInterface() {
     setResults(null);
 
     try {
-      const response = await axios.post("http://192.168.97.15:5000/client-tools", {
+      const response = await axios.post("http://100.71.2.111:5000/client-tools", {
         input: clientInput,
       });
       setResults(response.data);
@@ -43,7 +43,7 @@ export default function AIInterface() {
         <CardHeader>
           <CardTitle className="text-xl font-bold">Outil AI pour les Clients</CardTitle>
           <p className="text-sm text-gray-500">
-            Entrez vos besoins, et l'IA génèrera un budget estimé, des étapes techniques et des user stories.
+            Entrez vos besoins, et lIA génèrera un budget estimé, des étapes techniques et des user stories.
           </p>
         </CardHeader>
         <CardContent>
