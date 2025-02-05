@@ -88,6 +88,7 @@ export const EditProjectForm = ({
       {
         onSuccess: ({ data }) => {
           form.reset();
+          router.push(`/workspaces/${initialValues.workpaceId}/projects/${initialValues.$id}`);
         },
       }
     );
