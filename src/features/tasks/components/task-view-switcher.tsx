@@ -1,18 +1,34 @@
 "use client";
 
-import { PlusIcon } from "lucide-react"
+import { PlusIcon } from "lucide-react";
+import { useQueryState } from "nuqs";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { DottedSeparator } from "@/components/dotted-separator"
-import { Button } from "@/components/ui/button"
+import { useWorkspaceId } from "@/features/workspaces/hooks/use-workspace-id";
 
-import { useCreateTaskModal } from "../hooks/use-create-task-modal"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DottedSeparator } from "@/components/dotted-separator";
+import { Button } from "@/components/ui/button";
+
+import { useGetTasks } from "../api/use-get-tasks";
+import { useCreateTaskModal } from "../hooks/use-create-task-modal";
 
 export const TaskViewSwitcher = () => {
+    const [view, setView] = useQueryState("task-view", {
+        defaultValue: "table",
+    });
+
+    const workspaceId = useWorkspaceId();
     const { open } = useCreateTaskModal();
+
+    const { 
+        data: tasks,
+        isLoading: isLoadingTasks
+    } = useGetTasks({ workspaceId });
         
     return (
         <Tabs
+            defaultValue={view}
+            onValueChange={setView}
             className="flex-1 w-full border rounded-lg"
         >
             <div className="h-full flex flex-col overflow-auto p-4">
@@ -50,13 +66,13 @@ export const TaskViewSwitcher = () => {
                     <DottedSeparator className="my-4"/>
                     <>
                         <TabsContent value="table" className="mt-0">
-                            Data table
+                            {JSON.stringify(tasks)}
                         </TabsContent>
                         <TabsContent value="kanban" className="mt-0">
-                            Data kanban
+                            {JSON.stringify(tasks)}                        
                         </TabsContent>
                         <TabsContent value="calendar" className="mt-0">
-                            Data calendar
+                            {JSON.stringify(tasks)} 
                         </TabsContent>
                     </>
                 </div>

@@ -31,7 +31,7 @@ const app = new Hono()
             })
         ),
         async (c) => {
-            const { users } = createAdminClient();
+            const {users} = await createAdminClient();
             const databases = c.get("databases");
             const user = c.get("user");
 
@@ -90,7 +90,7 @@ const app = new Hono()
                 query,
             );
 
-            const projectIds = tasks.documents.map((task) => task.projectsId);
+            const projectIds = tasks.documents.map((task) => task.projectId);
             const assigneeIds = tasks.documents.map((task) => task.assigneeId);
 
             const projects = await databases.listDocuments<Project> (
