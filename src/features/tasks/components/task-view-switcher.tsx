@@ -1,6 +1,6 @@
 "use client";
 
-import { PlusIcon } from "lucide-react";
+import { Loader, PlusIcon } from "lucide-react";
 import { useQueryState } from "nuqs";
 
 import { useWorkspaceId } from "@/features/workspaces/hooks/use-workspace-id";
@@ -10,9 +10,20 @@ import { DottedSeparator } from "@/components/dotted-separator";
 import { Button } from "@/components/ui/button";
 
 import { useGetTasks } from "../api/use-get-tasks";
+import { useTaskFilters } from "../hooks/use-task-filters";
 import { useCreateTaskModal } from "../hooks/use-create-task-modal";
 
+import { DataFilters } from "./data-filters";
+import { DataTable } from "./data-table";
+import { columns } from "./columns";
+
 export const TaskViewSwitcher = () => {
+    const [{
+            status,
+            assigneeId,
+            projectId,
+            dueDate
+        }] = useTaskFilters();
     const [view, setView] = useQueryState("task-view", {
         defaultValue: "table",
     });
@@ -23,7 +34,13 @@ export const TaskViewSwitcher = () => {
     const { 
         data: tasks,
         isLoading: isLoadingTasks
-    } = useGetTasks({ workspaceId });
+    } = useGetTasks({ 
+        workspaceId,
+        projectId,
+        assigneeId,
+        status,
+        dueDate,
+    });
         
     return (
         <Tabs
@@ -62,11 +79,16 @@ export const TaskViewSwitcher = () => {
                         New
                     </Button>
                     <DottedSeparator className="my-4"/>
-                    Data filters
+                        <DataFilters />
                     <DottedSeparator className="my-4"/>
+                    {isLoadingTasks ? (
+                        <div className="w-full border rounded-lg h-[200px] flex flex-col items-center justify-center">
+                            <Loader className="size-5 animate-spin text-muted-foreground" />
+                        </div>
+                    ) : (
                     <>
                         <TabsContent value="table" className="mt-0">
-                            {JSON.stringify(tasks)}
+                            <DataTable columns={columns} data={tasks?.documents ?? []} />
                         </TabsContent>
                         <TabsContent value="kanban" className="mt-0">
                             {JSON.stringify(tasks)}                        
@@ -75,6 +97,8 @@ export const TaskViewSwitcher = () => {
                             {JSON.stringify(tasks)} 
                         </TabsContent>
                     </>
+                    )}
+                    
                 </div>
             </div>
         </Tabs>
