@@ -78,28 +78,27 @@ export const TaskViewSwitcher = () => {
                         <PlusIcon className="size-4 mr-2"/>
                         New
                     </Button>
-                    <DottedSeparator className="my-4"/>
-                        <DataFilters />
-                    <DottedSeparator className="my-4"/>
-                    {isLoadingTasks ? (
-                        <div className="w-full border rounded-lg h-[200px] flex flex-col items-center justify-center">
-                            <Loader className="size-5 animate-spin text-muted-foreground" />
-                        </div>
-                    ) : (
-                    <>
-                        <TabsContent value="table" className="mt-0">
-                            <DataTable columns={columns} data={tasks?.documents ?? []} />
-                        </TabsContent>
-                        <TabsContent value="kanban" className="mt-0">
-                            {JSON.stringify(tasks)}                        
-                        </TabsContent>
-                        <TabsContent value="calendar" className="mt-0">
-                            {JSON.stringify(tasks)} 
-                        </TabsContent>
-                    </>
-                    )}
-                    
                 </div>
+                <DottedSeparator className="my-4"/>
+                    <DataFilters />
+                <DottedSeparator className="my-4"/>
+                {isLoadingTasks ? (
+                    <div className="w-full border rounded-lg h-[200px] flex flex-col items-center justify-center">
+                        <Loader className="size-5 animate-spin text-muted-foreground" />
+                    </div>
+                ) : (
+                <>
+                    <TabsContent value="table" className="mt-0">
+                        <DataTable columns={columns} data={tasks?.documents ?? []} />
+                    </TabsContent>
+                    <TabsContent value="kanban" className="mt-0">
+                        {JSON.stringify(tasks)}                        
+                    </TabsContent>
+                    <TabsContent value="calendar" className="mt-0">
+                        {JSON.stringify(tasks)} 
+                    </TabsContent>
+                </>
+                )}
             </div>
         </Tabs>
     )

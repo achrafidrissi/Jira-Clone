@@ -10,9 +10,9 @@ export enum TaskStatus {
 
 export type Task = Models.Document & {
     name: string; 
-    status: string;
+    status: TaskStatus;
     assigneeId: string;
     projectId: string;
-    position: string;
+    position: number;
     dueDate: string;
 };
