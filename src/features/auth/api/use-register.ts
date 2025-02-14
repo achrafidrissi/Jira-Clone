@@ -19,7 +19,7 @@ export const useRegister = () => {
 
       if (!response.ok) {
         throw new Error("Failed to register");
-      }
+      } 
 
       return await response.json();
     },
