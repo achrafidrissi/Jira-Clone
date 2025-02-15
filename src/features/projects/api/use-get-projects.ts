@@ -17,9 +17,9 @@ interface UseGetProjectsProps {
         throw new Error("Failed to fetch projects");
       }
 
-      const data = await response.json();
+      const { data } = await response.json();
 
-      return data.data;
+      return data;
     },
   });
 
