@@ -35,9 +35,8 @@ const app = new Hono()
       const members = await databases.listDocuments<Member>(
         DATABASE_ID, 
         MEMBERS_ID, 
-        [
-          Query.equal("workspaceId", workspaceId),
-        ]);
+        [Query.equal("workspaceId", workspaceId)]
+      );
 
       const populatedMembers = await Promise.all(
         members.documents.map(async (member) => {
@@ -58,18 +57,20 @@ const app = new Hono()
       });
     }
   )
-  .delete("/:memberId", sessionMiddleware, 
+  .delete(
+    "/:memberId",
+    sessionMiddleware,
     async (c) => {
-    const { memberId } = c.req.param();
-    const user = c.get("user");
-    const databases = c.get("databases");
-    const memberToDelete = await databases.getDocument(
-      DATABASE_ID,
-      MEMBERS_ID,
-      memberId
-    );
+      const { memberId } = c.req.param();
+      const user = c.get("user");
+      const databases = c.get("databases");
+      const memberToDelete = await databases.getDocument(
+        DATABASE_ID,
+        MEMBERS_ID,
+        memberId
+      );
 
-    const allMembersInWorkspace = await databases.listDocuments(
+      const allMembersInWorkspace = await databases.listDocuments(
         DATABASE_ID,
         MEMBERS_ID,
         [Query.equal("workspaceId", memberToDelete.workspaceId)]
@@ -80,7 +81,7 @@ const app = new Hono()
         workspaceId: memberToDelete.workspaceId,
         userId: user.$id,
       });
-      
+
       if (!member) {
         return c.json({ error: "Unauthorized" }, 401);
       }
@@ -91,69 +92,114 @@ const app = new Hono()
 
       if (allMembersInWorkspace.total === 1) {
         // Prevent deleting the last member in the workspace to avoid leaving it empty
-        return c.json({ error: "Cannot delete the only member in the workspace" }, 401); 
+        return c.json(
+          { error: "Cannot delete the only member in the workspace" },
+          401
+        );
       }
 
-      await databases.deleteDocument(
-        DATABASE_ID,
-        MEMBERS_ID,
-        memberId,
-      );
+      await databases.deleteDocument(DATABASE_ID, MEMBERS_ID, memberId);
 
       return c.json({ data: { $id: memberToDelete.$id } });
-  })
+    }
+  )
   .patch(
     "/:memberId",
     sessionMiddleware,
-    zValidator("json", z.object({ role: z.nativeEnum (MemberRole) })),
+    zValidator("json", z.object({ role: z.nativeEnum(MemberRole) })),
     async (c) => {
-        const { memberId } = c.req.param();
-        const { role } = c.req.valid("json");
-        const user = c.get("user");
-        const databases = c.get("databases");
+      const { memberId } = c.req.param();
+      const { role } = c.req.valid("json");
+      const user = c.get("user");
+      const databases = c.get("databases");
 
-        const memberToUpdate = await databases.getDocument(
-          DATABASE_ID,
-          MEMBERS_ID,
-          memberId
-        );
-    
-        const allMembersInWorkspace = await databases.listDocuments(
-            DATABASE_ID,
-            MEMBERS_ID,
-            [Query.equal("workspaceId", memberToUpdate.workspaceId)]
-          );
-    
-          const member = await getMember({
-            databases,
-            workspaceId: memberToUpdate.workspaceId,
-            userId: user.$id,
-          });
-          
-          if (!member) {
-            return c.json({ error: "Unauthorized" }, 401);
-          }
-    
-          if (member.role !== MemberRole.ADMIN) {
-            return c.json({ error: "Unauthorized" }, 401);
-          }
-    
-          if (allMembersInWorkspace.total === 1) {
-            // Prevent deleting the last member in the workspace to avoid leaving it empty
-            return c.json({ error: "Cannot downgrade the only member in the workspace" }, 401); 
-          }
-    
-          await databases.updateDocument(
-            DATABASE_ID,
-            MEMBERS_ID,
-            memberId,
-            {
-                role
-            }
-          );
-    
-          return c.json({ data: { $id: memberToUpdate.$id } });
+      const memberToUpdate = await databases.getDocument(
+        DATABASE_ID,
+        MEMBERS_ID,
+        memberId
+      );
+
+      const allMembersInWorkspace = await databases.listDocuments(
+        DATABASE_ID,
+        MEMBERS_ID,
+        [Query.equal("workspaceId", memberToUpdate.workspaceId)]
+      );
+
+      const member = await getMember({
+        databases,
+        workspaceId: memberToUpdate.workspaceId,
+        userId: user.$id,
+      });
+
+      if (!member) {
+        return c.json({ error: "Unauthorized" }, 401);
       }
+
+      if (member.role !== MemberRole.ADMIN) {
+        return c.json({ error: "Unauthorized" }, 401);
+      }
+
+      if (allMembersInWorkspace.total === 1) {
+        // Prevent downgrading the only member in the workspace
+        return c.json(
+          { error: "Cannot downgrade the only member in the workspace" },
+          401
+        );
+      }
+
+      await databases.updateDocument(
+        DATABASE_ID,
+        MEMBERS_ID,
+        memberId,
+        { role }
+      );
+
+      return c.json({ data: { $id: memberToUpdate.$id } });
+    }
   )
+  // New endpoint for adding/updating a member's description
+  .post(
+    "/add-description-member/:memberId",
+    sessionMiddleware,
+    zValidator("json", z.object({ description: z.string() })),
+    async (c) => {
+      const { memberId } = c.req.param();
+      const { description } = c.req.valid("json");
+      const user = c.get("user");
+      const databases = c.get("databases");
+
+      // Get the member document to update
+      const memberToUpdate = await databases.getDocument(
+        DATABASE_ID,
+        MEMBERS_ID,
+        memberId
+      );
+
+      // Authorization: allow update if the user is an admin or updating their own description
+      const member = await getMember({
+        databases,
+        workspaceId: memberToUpdate.workspaceId,
+        userId: user.$id,
+      });
+
+      if (!member) {
+        return c.json({ error: "Unauthorized" }, 401);
+      }
+
+      if (member.role !== MemberRole.ADMIN && user.$id !== memberToUpdate.userId) {
+        return c.json({ error: "Unauthorized" }, 401);
+      }
+
+      // Update the document with the new description
+      await databases.updateDocument(
+        DATABASE_ID,
+        MEMBERS_ID,
+        memberId,
+        { description }
+      );
+
+      return c.json({ data: { $id: memberToUpdate.$id, description } });
+    }
+  );
 
 export default app;
