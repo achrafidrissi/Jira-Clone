@@ -19,7 +19,7 @@ import {
 import { useDeleteMember } from "@/features/members/api/use-delete-member";
 import { useUpdateMember } from "@/features/members/api/use-update-member";
 import { useConfirm } from "@/hooks/use-confirm";
-import { MemberRole } from "@/features/members/type";
+import { MemberRole } from "@/features/members/types";
 
 export const MembersList = () => {
   const workspaceId = useWorkspaceId();

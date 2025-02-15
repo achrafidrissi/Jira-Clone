@@ -1,11 +1,13 @@
-import { zValidator } from "@hono/zod-validator";
-import { loginSchema, registerSchema } from "../schemas";
 import { Hono } from "hono";
-import { createAdminClient } from "@/lib/appwrite";
 import { ID } from "node-appwrite";
 import { deleteCookie, setCookie } from "hono/cookie";
-import { AUTH_COOKIE } from "../constants";
+import { zValidator } from "@hono/zod-validator";
+
+import { createAdminClient } from "@/lib/appwrite";
 import { sessionMiddleware } from "@/lib/session-middleware";
+
+import { AUTH_COOKIE } from "../constants";
+import { loginSchema, registerSchema } from "../schemas";
 
 const app = new Hono()
   .get("/current", sessionMiddleware, (c) => {

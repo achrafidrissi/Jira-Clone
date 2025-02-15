@@ -108,13 +108,10 @@ export const EditWorkspaceForm = ({
     };
 
     mutate(
-      { form: finalValues, param: { workspaceId: initialValues.$id } },
-      {
-        onSuccess: ({ data }) => {
-          form.reset();
-        },
-      }
-    );
+      { 
+        form: finalValues, 
+        param: { workspaceId: initialValues.$id } 
+      });
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {

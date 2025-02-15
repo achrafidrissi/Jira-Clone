@@ -4,6 +4,7 @@ import { useCallback } from "react";
 import { Loader, PlusIcon } from "lucide-react";
 import { useQueryState } from "nuqs";
 
+import { useProjectId } from "@/features/projects/hooks/use-project-id";
 import { useWorkspaceId } from "@/features/workspaces/hooks/use-workspace-id";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -40,6 +41,7 @@ export const TaskViewSwitcher = ({ hideProjectFilter}: TaskViewSwitcherProps) =>
     });
 
     const workspaceId = useWorkspaceId();
+    const paramProjectId = useProjectId();
     const { open } = useCreateTaskModal();
 
     const { mutate: bulkUpdate} = useBulkUpdateTask();
@@ -49,7 +51,7 @@ export const TaskViewSwitcher = ({ hideProjectFilter}: TaskViewSwitcherProps) =>
         isLoading: isLoadingTasks
     } = useGetTasks({ 
         workspaceId,
-        projectId,
+        projectId: paramProjectId || projectId,
         assigneeId,
         status,
         dueDate,

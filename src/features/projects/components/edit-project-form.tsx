@@ -1,10 +1,18 @@
 "use client";
 
 import { z } from "zod";
-import { useForm } from "react-hook-form";
+import Image from "next/image";
 import { useRef } from "react";
+import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowLeftIcon, ImageIcon } from "lucide-react";
 
+import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useConfirm } from "@/hooks/use-confirm";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { DottedSeparator } from "@/components/dotted-separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -15,15 +23,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ArrowLeftIcon, CopyIcon, ImageIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
-import { useConfirm } from "@/hooks/use-confirm";
-import { toast } from "sonner";
 
 import { Project } from "../types";
 import { updateProjectSchema } from "../schemas";
@@ -42,10 +41,9 @@ export const EditProjectForm = ({
   const router = useRouter();
   const { mutate, isPending } = useUpdateProject();
 
-  const { mutate: deleteProject, isPending: isDeletingProject } =
-    useDeleteProject();
+  const { mutate: deleteProject, isPending: isDeletingProject } = useDeleteProject();
   
-    const [DeleteDialog, confirmDelete] = useConfirm(
+  const [DeleteDialog, confirmDelete] = useConfirm (
     "Delete Project",
     "This action cannot be undone.",
     "destructive"
@@ -72,7 +70,7 @@ export const EditProjectForm = ({
       },
       {
         onSuccess: () => {
-          window.location.href = "/workspaces/${initialValues.workspaceId}";
+          window.location.href = `/workspaces/${initialValues.workspaceId}`;
         },
       });
   };  
@@ -83,15 +81,10 @@ export const EditProjectForm = ({
       image: values.image instanceof File ? values.image : "",
     };
 
-    mutate(
-      { form: finalValues, param: { projectId: initialValues.$id } },
-      {
-        onSuccess: ({ data }) => {
-          form.reset();
-          router.push(`/workspaces/${initialValues.workpaceId}/projects/${initialValues.$id}`);
-        },
-      }
-    );
+    mutate({ 
+      form: finalValues, 
+      param: { projectId: initialValues.$id } 
+    });
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -250,7 +243,7 @@ export const EditProjectForm = ({
               size="sm"
               variant="destructive"
               type="button"
-              disabled={isPending}
+              disabled={isPending || isDeletingProject}
               onClick={handleDelete}
             >
               Delete Project
