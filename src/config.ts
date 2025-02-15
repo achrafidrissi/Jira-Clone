@@ -1,3 +1,11 @@
+export const config = {
+    domainName: "quillminds.com",
+    appName: "QuillMinds",
+    appDescription:
+      "QuillMinds is ai-powered lesson preparation tool for teachers.",
+  };
+  
+
 export const DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!;
 export const WORKSPACES_ID = process.env.NEXT_PUBLIC_APPWRITE_WORKSPACES_ID!;
 export const MEMBERS_ID = process.env.NEXT_PUBLIC_APPWRITE_MEMBERS_ID!;
