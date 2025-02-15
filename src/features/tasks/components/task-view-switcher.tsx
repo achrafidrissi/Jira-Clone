@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
-import { Loader, PlusIcon } from "lucide-react";
+import { Loader, PlusIcon, Sparkles } from "lucide-react";
 import { useQueryState } from "nuqs";
 
 import { useProjectId } from "@/features/projects/hooks/use-project-id";
@@ -64,6 +64,32 @@ export const TaskViewSwitcher = ({ hideProjectFilter}: TaskViewSwitcherProps) =>
             json: { tasks },
         })
     }, [bulkUpdate]);
+
+    if (!paramProjectId) {
+        console.log("No project selected")
+    }
+
+    const handleAutoFill = async () => {
+        const payload = {
+            workspaceId,
+            projectId: paramProjectId || projectId,
+            assignees: tasks?.documents.map(task => task.assigneeId) || [],
+        };
+
+        const response = await fetch('', {
+            method: 'POST',
+            headers: {
+                'Content-Type' : 'application/json',
+            },
+            body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to send data to the external API");
+        }
+
+        console.log("Retrieved data : ", payload);
+    }
         
     return (
         <Tabs
@@ -93,14 +119,25 @@ export const TaskViewSwitcher = ({ hideProjectFilter}: TaskViewSwitcherProps) =>
                             Calendar
                         </TabsTrigger>
                     </TabsList>
-                    <Button
-                        onClick={open}
-                        size="sm"
-                        className="w-full lg:w-auto"
-                    >
-                        <PlusIcon className="size-4 mr-2"/>
-                        New
-                    </Button>
+                    <div className="flex justify-between">
+                        <Button
+                            onClick={open}
+                            size="sm"
+                            className="w-full lg:w-auto"
+                        >
+                            <PlusIcon className="size-4 mr-2"/>
+                            New
+                        </Button>
+                        <Button
+                            onClick={handleAutoFill}
+                            variant="secondary"
+                            size="sm"
+                            className="w-full lg:w-auto"
+                        >
+                            <Sparkles className="size-4 mr-2"/>
+                            Auto Fill 
+                        </Button>
+                    </div>
                 </div>
                 <DottedSeparator className="my-4"/>
                     <DataFilters hideProjectFilter={ hideProjectFilter } />
