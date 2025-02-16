@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Analytics } from "@/components/analytics";
 import { PageError } from "@/components/page-error";
 import { PageLoader } from "@/components/page-loader";
-import EmailPopup from "@/components/EmailPopUp";
+import EmailPopup from "@/features/email/components/EmailPopUp";
 
 
 

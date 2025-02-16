@@ -6,7 +6,8 @@ import workspaces from "@/features/workspaces/server/route";
 import members from "@/features/members/server/route"
 import projects from "@/features/projects/server/route"
 import tasks from "@/features/tasks/server/route"
-import sendEmail  from "@/features/workspaces/api/send-email";
+import email from "@/features/email/server/route" // Add this import
+
 
 const app = new Hono().basePath("/api");
 
@@ -17,7 +18,7 @@ const routes = app
   .route("/workspaces", workspaces)
   .route("/projects", projects)
   .route("/tasks", tasks)
-  .route("/send-email", sendEmail);
+  .route("/email", email) // Add this line
 
 export const GET = handle(app);
 export const POST = handle(app);

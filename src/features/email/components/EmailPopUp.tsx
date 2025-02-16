@@ -27,8 +27,9 @@ const EmailPopup: React.FC<EmailPopupProps> = ({
     try {
       setIsSending(true);
       
-      const response = await fetch('/api/send-email', {
+      const response = await fetch('http://localhost:3000/api/email', {
         method: 'POST',
+        credentials: 'include', // Add this line
         headers: {
           'Content-Type': 'application/json',
         },
