@@ -5,6 +5,7 @@ import { PencilIcon } from "lucide-react";
 
 import { useProjectId } from "@/features/projects/hooks/use-project-id";
 import { useGetProject } from "@/features/projects/api/use-get-project";
+
 import { ProjectAvatar } from "@/features/projects/components/project-avatar";
 import { TaskViewSwitcher } from "@/features/tasks/components/task-view-switcher";
 import { useGetProjectAnalytics } from "@/features/projects/api/use-get-project-analytics";
@@ -13,11 +14,15 @@ import { Button } from "@/components/ui/button";
 import { Analytics } from "@/components/analytics";
 import { PageError } from "@/components/page-error";
 import { PageLoader } from "@/components/page-loader";
+import EmailPopup from "@/components/EmailPopUp";
+
+
 
 export const ProjectIdClient = () => {
     const projectId = useProjectId();
     const { data: project, isLoading: isLoadingProject } = useGetProject({ projectId });
     const { data: analytics, isLoading: isLoadingAnalytics } = useGetProjectAnalytics({ projectId });
+
 
     const isLoading = isLoadingProject || isLoadingAnalytics;
 
@@ -48,6 +53,19 @@ export const ProjectIdClient = () => {
                             Edit Project
                         </Link>
                     </Button>
+
+                    <EmailPopup
+                        productOwnerEmail={"achrafidrissi05@gmail.com"} // Email du propriétaire du produit
+                        productOwnerName={"Achraf"} // Nom du propriétaire du produit
+                        projectTopic={"Sujet par défaut"} // Sujet par défaut de l'email
+                        projectMessage={"Message par défaut"} // Message par défaut de l'email
+                        />
+                    {/* <Button  size="sm" asChild>
+                        <Link href={`/workspaces/${project.workspaceId}/projects/${project.$id}/email`}>
+                            <PencilIcon className="size-4 mr-2"/>
+                            Send Mail
+                        </Link>
+                    </Button> */}
                 </div>
             </div>
             {analytics ? (
