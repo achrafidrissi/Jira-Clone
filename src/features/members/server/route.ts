@@ -158,7 +158,7 @@ const app = new Hono()
     }
   )
   // New endpoint for adding/updating a member's description
-  .post(
+  .patch(
     "/add-description-member/:memberId",
     sessionMiddleware,
     zValidator("json", z.object({ description: z.string() })),

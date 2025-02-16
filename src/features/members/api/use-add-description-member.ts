@@ -4,11 +4,11 @@ import { InferRequestType, InferResponseType } from "hono";
 import { client } from "@/lib/rpc";
 
 type ResponseType = InferResponseType<
-  typeof client.api.members["add-description-member"][":memberId"]["$post"],
+  typeof client.api.members["add-description-member"][":memberId"]["$patch"],
   200
 >;
 type RequestType = InferRequestType<
-  typeof client.api.members["add-description-member"][":memberId"]["$post"]
+  typeof client.api.members["add-description-member"][":memberId"]["$patch"]
 >;
 
 export const useAddDescriptionMember = () => {
@@ -16,7 +16,7 @@ export const useAddDescriptionMember = () => {
 
   const mutation = useMutation<ResponseType, Error, RequestType>({
     mutationFn: async ({ param, json }) => {
-      const response = await client.api.members["add-description-member"][":memberId"]["$post"]({
+      const response = await client.api.members["add-description-member"][":memberId"]["$patch"]({
         param,
         json,
       });
