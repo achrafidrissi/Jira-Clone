@@ -405,4 +405,35 @@ const app = new Hono()
         }
     )
 
+    .post(
+        "/tasks/bulk-create",
+        sessionMiddleware,
+        zValidator("json", z.array(z.object({
+          assigneeId: z.string(),
+          description: z.string(),
+          dueDate: z.string(),
+          name: z.string(),
+          position: z.number(),
+          projectId: z.string(),
+          status: z.string(),
+          workspaceId: z.string(),
+        }))),
+        async (c) => {
+          const databases = c.get("databases");
+          const tasks = c.req.valid("json");
+      
+          const createdTasks = await Promise.all(
+            tasks.map(task => 
+              databases.createDocument(
+                DATABASE_ID,
+                TASKS_ID,
+                ID.unique(),
+                task
+              )
+            )
+          );
+      
+          return c.json({ data: createdTasks });
+        }
+      );
 export default app;

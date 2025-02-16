@@ -7,9 +7,10 @@ import { useQueryState } from "nuqs";
 import { useProjectId } from "@/features/projects/hooks/use-project-id";
 import { useWorkspaceId } from "@/features/workspaces/hooks/use-workspace-id";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DottedSeparator } from "@/components/dotted-separator";
+import AutoFill from "@/components/auto-fill";
 import { Button } from "@/components/ui/button";
+import { DottedSeparator } from "@/components/dotted-separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { useGetTasks } from "../api/use-get-tasks";
 import { useBulkUpdateTask } from "../api/use-bulk-update-tasks";
@@ -49,7 +50,8 @@ export const TaskViewSwitcher = ({ hideProjectFilter}: TaskViewSwitcherProps) =>
 
     const { 
         data: tasks,
-        isLoading: isLoadingTasks
+        isLoading: isLoadingTasks, 
+        refetch: refetchTasks
     } = useGetTasks({ 
         workspaceId,
         projectId: paramProjectId || projectId,
@@ -130,7 +132,6 @@ export const TaskViewSwitcher = ({ hideProjectFilter}: TaskViewSwitcherProps) =>
                 param: { projectId: projectIdToUse },
             });
 
-
             if (!projectResponse.ok) {
                 throw new Error("Failed to fetch project details");
             }
@@ -163,7 +164,7 @@ export const TaskViewSwitcher = ({ hideProjectFilter}: TaskViewSwitcherProps) =>
             };
 
             // Send data
-            const apiResponse = await fetch('', {
+            const apiResponse = await fetch('', { 
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -172,8 +173,10 @@ export const TaskViewSwitcher = ({ hideProjectFilter}: TaskViewSwitcherProps) =>
             });
 
             if (!apiResponse.ok) {
-                throw new Error("Failed to send data to the external API");
+                throw new Error("Failed to send data to Ollama API");
             }
+
+            await refetchTasks();
 
             console.log("Retrieved data:", payload);
         } catch (error) {
@@ -218,15 +221,7 @@ export const TaskViewSwitcher = ({ hideProjectFilter}: TaskViewSwitcherProps) =>
                             <PlusIcon className="size-4 mr-2"/>
                             New
                         </Button>
-                        <Button
-                            onClick={handleAutoFill}
-                            variant="secondary"
-                            size="sm"
-                            className="w-full lg:w-auto"
-                        >
-                            <Sparkles className="size-4 mr-2"/>
-                            Auto Fill 
-                        </Button>
+                        <AutoFill />
                     </div>
                 </div>
                 <DottedSeparator className="my-4"/>
