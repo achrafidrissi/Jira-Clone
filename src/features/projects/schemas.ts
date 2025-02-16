@@ -6,6 +6,7 @@ export const createProjectSchema = z.object({
     z.instanceof(File),
     z.string().transform((value) => value === "" ? undefined : value),
   ]).optional(),
+  description: z.string().trim().min(1, "Required"),
   workspaceId: z.string(),
 
 });

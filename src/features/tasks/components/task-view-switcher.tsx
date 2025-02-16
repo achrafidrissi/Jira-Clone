@@ -24,6 +24,7 @@ import { DataFilters } from "./data-filters";
 import { DataCalendar } from "./data-calendar";
 
 import { TaskStatus } from "../types";
+import { client } from "@/lib/rpc";
 
 interface TaskViewSwitcherProps {
     hideProjectFilter?: boolean;
@@ -69,27 +70,116 @@ export const TaskViewSwitcher = ({ hideProjectFilter}: TaskViewSwitcherProps) =>
         console.log("No project selected")
     }
 
+
+    // const handleAutoFill = async () => {
+    //     try {
+
+            
+
+    //         // Fetch members from the API
+    //         const response = await client.api.members.$get({ query: { workspaceId } });
+
+    //         if (!response.ok) {
+    //             throw new Error("Failed to fetch members");
+    //         }
+
+    //         const data = await response.json();
+    //         const members = data.data.documents;
+
+    //         // Map over members instead of tasks
+    //         const assigneesWithDetails = members.map(member => ({
+    //             id: member.userId,
+    //             description: member.description || "No description available"
+    //         }));
+
+    //         // Construct payload
+    //         const payload = {
+    //             workspaceId,
+    //             projectId: paramProjectId || projectId,
+    //             assignees: assigneesWithDetails
+    //         };
+
+    //         // Send data
+    //         const apiResponse = await fetch('', {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //             body: JSON.stringify(payload),
+    //         });
+
+    //         if (!apiResponse.ok) {
+    //             throw new Error("Failed to send data to the external API");
+    //         }
+
+    //         console.log("Retrieved data:", payload);
+    //     } catch (error) {
+    //         console.error("Error in handleAutoFill:", error);
+    //     }
+    // };
+
     const handleAutoFill = async () => {
-        const payload = {
-            workspaceId,
-            projectId: paramProjectId || projectId,
-            assignees: tasks?.documents.map(task => task.assigneeId) || [],
-        };
+        try {
+            const projectIdToUse = paramProjectId ?? projectId;
 
-        const response = await fetch('', {
-            method: 'POST',
-            headers: {
-                'Content-Type' : 'application/json',
-            },
-            body: JSON.stringify(payload),
-        });
+            if (!projectIdToUse) {
+                throw new Error("Project ID is required but was not provided.");
+            }
 
-        if (!response.ok) {
-            throw new Error("Failed to send data to the external API");
+            const projectResponse = await client.api.projects[":projectId"].$get({
+                param: { projectId: projectIdToUse },
+            });
+
+
+            if (!projectResponse.ok) {
+                throw new Error("Failed to fetch project details");
+            }
+
+            const projectData = await projectResponse.json();
+            const projectDescription = projectData.data?.description || "No description available";
+
+            // Fetch members from the API
+            const membersResponse = await client.api.members.$get({ query: { workspaceId } });
+
+            if (!membersResponse.ok) {
+                throw new Error("Failed to fetch members");
+            }
+
+            const membersData = await membersResponse.json();
+            const members = membersData.data.documents;
+
+            // Map over members instead of tasks
+            const assigneesWithDetails = members.map(member => ({
+                id: member.userId,
+                description: member.description || "No description available"
+            }));
+
+            // Construct payload
+            const payload = {
+                workspaceId,
+                projectId: paramProjectId || projectId,
+                projectDescription,  
+                assignees: assigneesWithDetails
+            };
+
+            // Send data
+            const apiResponse = await fetch('', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
+
+            if (!apiResponse.ok) {
+                throw new Error("Failed to send data to the external API");
+            }
+
+            console.log("Retrieved data:", payload);
+        } catch (error) {
+            console.error("Error in handleAutoFill:", error);
         }
-
-        console.log("Retrieved data : ", payload);
-    }
+    };
         
     return (
         <Tabs

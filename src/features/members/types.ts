@@ -9,4 +9,5 @@ export type Member = Models.Document & {
     workspaceId: string;
     userId: string;
     role: MemberRole;
+    description: string;
 };
