@@ -1,4 +1,3 @@
-import AIInterface from "@/components/AIComponent";
 import { getCurrent } from "@/features/auth/queries";
 import { redirect } from "next/navigation";
 import { WorkspaceIdClient } from "./client";
@@ -10,7 +9,6 @@ const WorkspaceIdPage = async ( ) => {
   return (
   <div className="">
     <WorkspaceIdClient />
-    <AIInterface />
   </div>
   )
 };
